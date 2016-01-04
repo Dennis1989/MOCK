@@ -10,6 +10,9 @@ Additionaly an automatic approach of identifying the best solution is implemente
 
 All cluster solutions and the approximated paretro front can be visualized by using a configurable functions.
 
-In order to get the package just type
+In order to get the packages just type
 
-`devtools::install_github("Dennis1989/MOCK-PESA-II")`
+`devtools::install_github("https://github.com/Dennis1989/MOCK","MOCK")`
+
+`devtools::install_github("https://github.com/Dennis1989/MOCK","PESAII")`
+
