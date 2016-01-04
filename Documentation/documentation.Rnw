@@ -6,7 +6,7 @@
 \usepackage[section]{placeins}
 
 \addbibresource{documentation.bib}
-\title{Documentation of MOCK-Package}
+\title{Documentation of MOCK and PESA-II Implementation in R}
 \author{Dennis Assenmacher, Christian Homberg}
 
 \let\endtitlepage\relax
@@ -52,12 +52,14 @@ Sys.setenv(TEXINPUTS=getwd(),
 \section{Introduction}
 This documentation provides information about the R packages MOCK and PESA-II. Both packages were created as part of a seminar on advanced R in 2015/2016. The main goal of this documentation is to give insights in how the MOCK algorithm, proposed by \textcite{handl} works in general, how it is implemented in R/C++ and how it can be used in order to get both analytical and visual results. Currently the packages are not available at the Comprehensive R Archive Network (CRAN). Therefore we suggest to install them via devtools:
 <<my-label, eval=FALSE>>=
-devtools::install_github("Dennis1989/MOCK-PESA-II")
+devtools::install_github("https://github.com/Dennis1989/MOCK","MOCK")
+
+devtools::install_github("https://github.com/Dennis1989/MOCK","PESAII")
 @
 
-Within the following chapters we will explain the basic concepts of multi-objective clustering as well as the concepts of MOCK and different evolutionary multiobjective algorithms (EMOAs). We additionally provide some implementation details and how MOCK can be adjusted. Finally we focus on implementation details as well as benchmarking and conclude with working examples and provide an outlook.
+Within the following chapters we will explain the basic concepts of multi-objective clustering as well as the concepts of MOCK and different evolutionary multiobjective algorithms (EMOAs). We additionally provide some implementation details and how MOCK can be adjusted. Finally we focus on implementation decisions as well as benchmarking and conclude with working examples and provide an outlook.
 \section{Multi-objective clustering}
-Data clustering in general can be informally described as the process of finding homogeneous groups of data objects. The question which arises is how can we assess the quality of clustering solutions and therefore seperate good solutions from bad ones. One would argue that this is only possible by having access to external expert knowledge. Since clustering is an unsupervised learning method, such knowledge is rarely available. Therefore internal clustering criteria are applied. \textcite{handl2007} describe it formally as an optimization problem: 
+Data clustering in general can be informally described as the process of finding homogeneous groups of data objects. The question which arises is how we can assess the quality of clustering solutions and therefore seperate good solutions from bad ones. One would argue that this is only possible by having access to external expert knowledge. Since clustering is an unsupervised learning method, such knowledge is rarely available. Therefore internal clustering criteria are applied. \textcite{handl2007} describe it formally as an optimization problem: 
 \begin{displaymath}
 P(C^*) = \underset{C\in\Omega}{\min}\ P(C)
 \end{displaymath}
@@ -70,11 +72,11 @@ In general one single criterion function would not be able to detect all possibl
 P_t(C^*) = \underset{C\in\Omega}{\min}\ P_t(C), t=1,...,n
 \end{displaymath}
 
-The most prominent clustering critera are based on either achieving a compact solution or a connected one. Compact clusters try to identify solutions which hold the variation between cluster data as small as possible. In this context the \textit{k}-means algorithm\cite{kmeans} and agglomerative clustering are frequently used. Connected clustering solutions on the other hand focus on grouping neighboring data together into one cluster. Average linkage tends to enforce the creation of those closely connected chains. However, it should be emphazised that it is not possible to detect all structures by only optimizing either compactness or connectedness. Therefore MOCK defines a multidimensional optimization task as stated above by optimizing in terms of compactness and connectedness. In the following section we will describe MOCKs evolutionary approach in detail.
+The most prominent clustering critera are based on either achieving a compact solution or a connected one. Compact clusters try to identify solutions which hold the variation between cluster data as small as possible. In this context the \textit{k}-means algorithm\cite{kmeans} and agglomerative clustering are frequently used. Connected clustering solutions on the other hand focus on grouping neighboring data together into one cluster. Average linkage tends to enforce the creation of those closely connected chains. However, it should be emphazised that it is not possible to detect all structures by only optimizing either compactness or connectedness. Therefore MOCK defines a multidimensional optimization task as stated above by optimizing in terms of compactness and connectedness. In the following section we will describe MOCK's evolutionary approach in detail.
 
 \section{MOCK}
 
-Basically MOCK can be separated into two distinct phases: The clustering phase and the Automatic determination of clustering solutions. In the following sections we describe each of those phases in detail.
+Basically MOCK can be separated into two distinct phases: The clustering phase and the automatic determination of clustering solutions. In the following sections we describe each of those phases in detail.
 
 \subsection{Clustering Phase}
 First of all, the clustering phase uses an evolutionary algorithm in order to obtain distinct nondominated cluster solutions which approximate the true pareto front. In case of MOCK, Handl suggests to use the pareto envelope-based selection algorithm version 2 (PESA-II). However, as a lot of different EMOA's currently exist, we try to describe the clustering phase more generally in order to be able to adapt MOCK to other EMOA's like SMS-EMOA or NSGA-II. A list of state of the art algorithms and their comparison can be inspected in \cite{comparison}.
@@ -105,7 +107,7 @@ The second objective function, which measures the connectedness, is called conne
 $x_{r,s}$ = $\frac{1}{j}$, if $\notin C_k:r\in C_k$ and $s\in C_k$
 \end{center}
 
-where $nn_{i,j}$ is the j'th nearest neighbour of i. The formula indicates that the overall connectivity increases if neighboring points are not in the same cluster. Therefore the objective should be minimized as well as the overall deviation.
+where $nn_{i,j}$ is the j'th nearest neighbor of i. The formula indicates that the overall connectivity increases if neighboring points are not in the same cluster. Therefore the objective should be minimized as well as the overall deviation.
 
 \subsubsection{Representation}
 Each clustering solution is represented as a locus-based adjacency representation \cite{handl}. Each cluster solution contains N genes, where one gene is equivalent to one data-object within a certain cluster problem. Each gene can take a value $\in 1..N$. If gene $i$ takes the value $j$, we can interpret it as an existing link between $i$ and $j$. Since we can implement this within a simple numeric vector and also are able to simply apply mutation and crossover operators, this representation seems to work well for MOCK. Note that there is some computational effort necessary to determine which data objects belong to the same cluster. Handl argues that this decoding step can be achieved in linear time \cite{handl}.
@@ -135,8 +137,8 @@ where $j = nn_{il}$ (j is l'th nearest neighbor of i). It is obvious that a link
 The probability of mutation can be directly integrated into the precomputed nearest neighbor matrix. More information on implementation details can found within chapter 5.
 
 \subsubsection{Initialization}
-An important step within the MOCK algroithm is the inital creation of initial solutions. The main goal is to achieve a well spreaded initial solution front in order to be able to search the whole solution space. As described in chapter 2, different single objective cluster algorithms perform well under either compactness or connectedness. Therefore, half of the initial solutions are generated with \textit{k}-means, which performs well
-under compactness, and the other half by generating connected solutions obtained from a minimum spanning tree. In both cases the same amount of solutions is created by conducting \textit{k}-means and respectively cutting the \textit{k}-largest edge of the minimum spanning tree where \textit{k} is iterated over 1 to maxCluster.
+An important step within the MOCK algroithm is the creation of initial solutions. The main goal is to achieve a well spreaded initial solution front in order to be able to search the whole solution space. As described in chapter 2, different single objective cluster algorithms perform well under either compactness or connectedness. Therefore, half of the initial solutions are generated with \textit{k}-means, which performs well
+under compactness, and the other half by generating connected solutions obtained from a minimum spanning tree. In both cases the same amount of solutions is created by conducting \textit{k}-means and respectively cutting the \textit{k}-largest edges of the minimum spanning tree where \textit{k} is iterated over 1 to maxCluster.
 \subsection{Automatic determination of clustering solutions}
 The previously introduced objective functions deviation and connectivity lead to a pareto front in two dimensional space. Since each point on the pareto front represents one non-dominated clustering solution (at least for the PESA-II implementation), it is not possible to identify one best solution in regard to the objective functions. Even more, the solutions differ in the amount of clusters (k), usually the deviation decreases as the connectivity and k increases. The solutions identified by MOCK during the clustering phase can therefore only be regarded as candidates which should be the object of further inspection, either by domain experts or by applying one of the many heuristic approaches for the determination of k in clustering theory. One approach which is also the basis for MOCK is to inspect the pareto front for a "knee", that is an area where the deviation greatly decreases while the connectivity does not increase much. Since the objective functions may be biased by the number of clusters, the inspection is conducted on a normalized pareto front. Furthermore, the MOCK pareto front is compared to reference fronts. These are generated by conducting MOCK on datasets with as similar characteristics as the original data as possible except for the existence of clusters. This data is generated uniformly within the eigenspace of the original data and back-transformed to its range. For each point of the pareto front the nearest Euclidean distance to any of the dominated control fronts is calculated, a measure called attainment score \ref{fig:attainment}. It can be expected that a large attainment score indicates a good solution since deviation and connectivity are especially good when compared to solutions on the control fronts with the same amount of clusters. By the same logic a plot of attainment scores and amount of clusters can help identify a set of potential best solutions\label{fig:attainment}. The local maxima in this plot build a set of promising candidates while the global maximum can point to the best solution. \cite{handl}
 
@@ -162,7 +164,7 @@ In contrast to most of the standard EMOAs individual-based selection criteria, P
 
 \item If a solution in IP dominates any solution in EP, delete those dominated solutions from EP and add IP's solution to EP.
 
-If a solution in IP is nondominated and EP is not full, add those solutions to EP. If EP is full only add the solution to EP if it is stored in a less crowded niche than any other solution. Therefore PESA-II encourages the exploration of the whole objective space. PESA-II is used within MOCK as the standard EMOA. One main advantage of PESA-II in that scenario is that IP determines the the amount of evaluations per generation and EP the maximum amount of final solutions. This seperation is not present in the other algorithms.
+If a solution in IP is nondominated and EP is not full, add those solutions to EP. If EP is full only add the solution to EP if it is stored in a less crowded niche than any other solution. Therefore PESA-II encourages the exploration of the whole objective space. PESA-II is used within MOCK as the standard EMOA. One main advantage of PESA-II in that scenario is that IP determines the the number of evaluations per generation and EP the maximum amount of final solutions. This seperation is not present in the other algorithms.
 \end{enumerate}
 
 Especially step three ensures the generation of a well spreaded pareto front since only those nondominated solutions are added to the external population which are situated within a less crowded niche.  
@@ -235,7 +237,7 @@ The results are depicted in figure \ref{fig:comparison}.
 
 A superficial visual inspection of the benchmarks reveals that both implementations produce very similar pareto fronts, both for the unnormalized and the normalized plots. In the following we will only consider the unnormalized cases. A normalization without distorting the aspect ratio of each pareto front is not possible since usually the only common point in both fronts is the one cluster solution.
 
-The dataset which produces the most similar results is Square1. In this case both pareto fronts overlap almost completely. On the first look, deviations between the fronts could be due to different random numbers generated during runtime. However, this benchmark shows the same characteristics as the others, only much less distinct. For one, our R implementation mostly dominates the original Mock tool for solutions with many clusters while the Mock tool tendentially finds more and better few-cluster solution. Also, just as for the Long1 dataset, the Mock tool finds more solutions at the right lower end of the pareto front. However, these are partially dominated by the R solutions and this observation does not apply to the Spiral dataset. Besides different random numbers there are two  more likely reasons why the implementations don’t produce more similar pareto fronts. Firstly, some MOCK parameters used in the original tool are unknown and can therefore be only guessed. We default to the parameters proposed in \cite{handl2007} (with $k_{User}=50$) which may differ from the actual implementation. Secondly, although our work is based on the pseudo-code and descriptions presented in \cite{handl2007} we cannot guarantee equality to the original implementation.
+The dataset which produces the most similar results is Square1. In this case both pareto fronts overlap almost completely. On the first look, deviations between the fronts could be due to different random numbers generated during runtime. However, this benchmark shows the same characteristics as the others, only much less distinct. For one, our R implementation mostly dominates the original Mock tool for solutions with many clusters while the Mock tool tends to find more and better few-cluster solution. Also, just as for the Long1 dataset, the Mock tool finds more solutions at the right lower end of the pareto front. However, these are partially dominated by the R solutions and this observation does not apply to the Spiral dataset. Besides different random numbers there are two  more likely reasons why the implementations don’t produce more similar pareto fronts. Firstly, some MOCK parameters used in the original tool are unknown and can therefore be only guessed. We default to the parameters proposed in \cite{handl2007} (with $k_{User}=50$) which may differ from the actual implementation. Secondly, although our work is based on the pseudo-code and descriptions presented in \cite{handl2007} we cannot guarantee equality to the original implementation.
 
 \subsection{Comparison with standard clustering algorithms}
 
@@ -253,7 +255,7 @@ The analysis of the results does not reveal new insights since for the Long1 and
 
 \subsection{Comparison between different EMOAs}
 
-Originally MOCK was intended to be used in combination with PESA-II. Since we added two more algorithms, namely NSGA-II and SMS-EMOA, a performance evaluation would show which algorithm works best. However, in order to achieve an objective result, we need to carefully specify MOCK's parameter for each individual algorithm. Because of their different selection strategies it is not possible to use the same number of generations. SMS-EMOA for example only generates one individual per iteration while NSGA-II generates $\mu$ new offsprings. Also we have to ensure, in terms of comparability, that the maximum number of solutions at our approximated-pareto front is the same for each algorithm. Figure \ref{fig:amount} states the amount of evaluations per generation and the parameter which determines the maximum amount of solutions, for each of the three algorithms.
+Originally MOCK was intended to be used in combination with PESA-II. Since we added two more algorithms, namely NSGA-II and SMS-EMOA, a performance evaluation would show which algorithm works best. However, in order to achieve an objective result, we need to carefully specify MOCK's parameter for each individual algorithm. Because of their different selection strategies it is not possible to use the same number of generations. SMS-EMOA for example only generates one individual per iteration while NSGA-II generates $\mu$ new offsprings. Also we have to ensure, in terms of comparability, that the maximum number of solutions at our approximated pareto front is the same for each algorithm. Figure \ref{fig:amount} states the amount of evaluations per generation and the parameter which determines the maximum amount of solutions, for each of the three algorithms.
 
 
 \begin{figure}[h]
@@ -278,7 +280,7 @@ max solutions & EPMax & \mu & \mu \\
 
 By choosing one algorithm and setting fixed parameters we can adjust the settings for the other algorithms in a way that the overall amount of evaluations, namely the call of the mock function is the same for all of them. Therefore the recommended parameter setup for PESA-II within the original MOCK paper is used \cite{handl2007}. The following Figure \ref{fig:parameter} shows the parameter specification for each algorithm.
 
-NSGA-II and SMS-EMOA do not differentiate between internal and external population as PESA-II does. Instead they specify $\mu$ in order to determine how many solutions will be available within the approximated pareto front. Using this specification we ensure that each algorithm executes 10.000 evaluations.
+NSGA-II and SMS-EMOA do not differentiate between internal and external population as PESA-II does. Instead they specify $\mu$ in order to determine how many solutions will be available within the approximated pareto front. Using this specification we ensure that each algorithm executes 10,000 evaluations.
 
 \begin{figure}[h]
 \begin{center}
@@ -307,7 +309,7 @@ p_m & 0.7 & 0.7 & 0.7 \\
 \label{fig:parameter}
 \end{center}
 \end{figure}
-Within the overall benchmark process we used three different datasets which were already analyzed in the latest publication of MOCK \cite{handl2007}: long1, square1 and spiral. \textcite{zitzler} propose three different quality-indicators for a multiobjective-optimization problem:
+Within the overall benchmark process we used three different datasets which were already analyzed in the latest publication of MOCK \cite{handl2007}: long1, square1 and spiral. \textcite{zitzler} propose three different quality indicators for a multiobjective optimization problem:
 
 \begin{enumerate}
 \item The distance of the approximated pareto front to the true pareto front should be minimized
@@ -326,9 +328,9 @@ Since the true pareto front is unknown, we evaluate our solutions by comparing t
 \end{figure}
 
 
-At first sight none of those three algorithms' pareto fronts is completely dominated by any other. However at least for our test runs NSGA-II has the lowest share of the oveall pareto front for all three data sets. Also it is evident that PESA-II finds the best solutions for high number of clusters and outperforms the other ones in most cases.
+At first sight none of those three algorithms' pareto fronts is completely dominated by any other. However at least for our test runs NSGA-II has the lowest share of the oveall pareto front for all three data sets. Also it is evident that PESA-II finds the best solutions for a high number of clusters and outperforms the other ones in most cases.
 
-By putting all 300 solutions into one single pareto front and deleting dominated points the overall contribution of each algorithm to this front can be determined. For the long and square dataset the contribution of SMS-EMOA algorithm to the overall pareto front is higher than the contribution of the other algorithms. However, 
+By putting all 300 solutions into one single pareto front and deleting dominated points the overall contribution of each algorithm to this front can be determined. For the long and square dataset the contribution of SMS-EMOA algorithm to the overall pareto front is higher than the contribution of the other algorithms.
 
 \begin{figure}[h]
 \begin{center}
@@ -408,7 +410,7 @@ printParetoFront(solution,method="fronts",labelType="none")
 \end{center}
 \end{figure}
 
-Here we also include the reference fronts. If those additional fronts should not be displayed we can simply omit them by leaving out the method attribute. Next we can have a look at the attainment plot (\ref{fig:attainment}) in order to identify promoising cluster solutions. Therefore 
+Here we also include the reference fronts. If those additional fronts should not be displayed we can simply omit them by leaving out the method attribute. Next we can have a look at the attainment plot (\ref{fig:attainment}) in order to identify promising cluster solutions. Therefore 
 <<attainmentShow, eval=FALSE, >>=
 printAttainmentScore(solution)
 @
@@ -431,7 +433,7 @@ printClusterSolution(solution,7,square,1)
 \label{fig:best}
 \end{center}
 \end{figure}
-has to be called. We can directly see the most promoising solutions visually indicated by their red color with their corresponding solution index. If we now want to look at the best solution (see Figure \ref{fig:best}), we can simply plot solution number seven by calling:
+has to be called. We can directly see the most promoising solutions visually indicated by their orange color with their corresponding solution index. If we now want to look at the best solution (see Figure \ref{fig:best}), we can simply plot solution number seven by calling:
 <<clusterSolutionsShow, eval=FALSE>>=
 printClusterSolution(solution,7,square,1)
 @
@@ -468,8 +470,8 @@ printMultipleParetoFronts(list(solution,smsSolution))
 
 
 \section{Outlook}
-All in all the MOCK and PESA-II packages provide tools to analyze data structures efficiently. Next to PESA-II two additional EMOAs can be used for the clustering phase. Also it is possible to adapt other EMOAs by using the  recombination and mutation operators. A plethora of vizualization methods allows the analyst to get a fast understanding of the 
+All in all the MOCK and PESA-II packages provide tools to analyze data structures efficiently. Next to PESA-II two additional EMOAs can be used for the clustering phase. Also it is possible to adapt other EMOAs by using the  recombination and mutation operators. A plethora of visualization methods allows the analyst to get a fast understanding of the underlying dara.
 
-However in terms of the algorithm's runtime there is still space for improvements as it was already indicated within the implementation section. Although most of the crucial high volume functions were implemented in C++, especially the creation of many reference fronts is still pretty timeconsuming. Since the mock run on the clusterdata as well as the mock runs on the reference data is totally independend on each other, those runs can be parallelized. For upcoming versions of the package this feature is planned to be implemented with the highest priority. In regard to performance, no matter which EMOA is used for MOCK, the R implementation cannot compete with the speed of the original Mock tool. This is because the latter is implemented in C, a language much closer to machine language. After all the goal of the seminar was to provide an R implementation of MOCK, which currently does not exist, so that all the advantages could be gained. One of which is the integration of the package into R which allows easy pre- and post-processing and eliminates the effort to create an interface between the original Mock tool and other statistical computation tools.
+However in terms of the algorithm's runtime there is still space for improvements as it was already indicated within the implementation section. Although most of the crucial high volume functions were implemented in C++, especially the creation of many reference fronts is still pretty timeconsuming. Since the mock run on the clusterdata as well as the mock runs on the reference data are totally independend from each other, those runs can be parallelized. For upcoming versions of the package this feature is planned to be implemented with the highest priority. In regard to performance, no matter which EMOA is used for MOCK, the R implementation cannot compete with the speed of the original Mock tool. This is because the latter is implemented in C, a language much closer to machine language. After all the goal of the seminar was to provide an R implementation of MOCK, which currently does not exist, so that all the advantages could be gained. One of which is the integration of the package into R which allows easy pre- and post-processing and eliminates the effort to create an interface between the original Mock tool and other statistical computation tools.
 \printbibliography
 \end{document}

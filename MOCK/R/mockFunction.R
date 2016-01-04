@@ -12,9 +12,40 @@ mockFunction <- function(data,param,nn,L){
 }
 
 #' @export
+#' @title Multiobjective clustering with automatic determination of the number of clusters.
+#' @description Implementation of MOCK as proposed by Handl.
+#' @param data Dataset on which to apply the MOCK algorithm.
+#' @param L Amount of nearest neighbors to consider for initialization, mutation, and connectivity objective function.
+#' Defaults to 10.
+#' @param ipMax Maximum size of internal solutions used to explore new potential solutions. Defaults to 10.
+#' @param epMax Maximum size of external population. Defaults to 1000.
+#' @param gens Number of generations. Defaults to 1000.
+#' @param crossRate Probability for parenting. Defaults to 0.7.
+#' @param sigma Standard deviation for mutate function. Defaults to 0.5.
+#' @param nGrid Number of grids. Defaults to 10.
+#' @param maxCluster Basis for initialization. Corresponds to k_user of original MOCK parameters. Default is dependent on
+#' chosen EMOA.
+#' @param method EMOA to apply. Defaults to "pesa". Other EMOAs are "nsga2" and "smsemoa".
+#' @param tournamentN Size of tournament when applying tournament selection in NSGA-II. Defaults to 2.
+#' @param printN Intervals (in generations) in which to update the progress updates when running the EMOAs.
+#' Simple one line progress bar, if NULL. Defaults to 10.
+#' @param distinctSolutions Boolean indicating whether NSGA-II and SMS-EMOA should omit duplicate solutions.
+#' Duplicates are removed within objective space. PESA-II doesn't add duplicate solutions to pareto front. Defaults to false.
+#' @param controlFronts Amount of control fronts to create after applying the EMOA. Defaults to 3.
+#' @param controlFrontMethod Method for creating the control data on which control fronts are based. Defaults to the
+#' method of creating uniform data in eigenspace of the original dataset proposed in 2007 by Handl. Other methods are
+#' "extrema" which creates points uniformly in original space of dataset and "" which creates points uniformly in unit hypercube.
+#' @param skipSearchBest Boolean indicating whether search for best MOCK solution should be skipped. Defaults to false and is set
+#' to true when control fronts are generated.
+#' @return List of 9 items. $sol allows to access the list of cluster solutions. Each cluster solution vector can be accessed with $solution,
+#' the encoded clustering with $param (can be decoded using decodeC), the amount of clusters with clusters, and the attainment score with $score.
+#' The index of the best solution can be accessed via $best. Also, some of the paramaters of the mock function call are included.
+#' @references 2004 Julia Handl - Multiobjective clustering with automatic 
+#' determination of the number of clusters.
+#' @references 2007 Julia Handl - An Evolutionary Approach to
+#' Multiobjective Clustering
 #' @importFrom RANN nn2
-#Actual MOCK function
-mock <- function(data,L=10,ipMax=10,epMax=1000,gens=100,crossRate=0.7,sigma=0.5,nGrid=10,maxCluster=NULL,
+mock <- function(data,L=10,ipMax=10,epMax=1000,gens=1000,crossRate=0.7,sigma=0.5,nGrid=10,maxCluster=NULL,
                  method="pesa",tournamentN=2,printN=10,distinctSolutions=F,controlFronts=3,controlFrontMethod="eigen",
                  skipSearchBest = F){
   if(!is.matrix(data)){

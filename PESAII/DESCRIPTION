@@ -1,11 +1,11 @@
 Package: PESAII
 Type: Package
-Title: What the package does (short line)
-Version: 0.0001
-Date: 2015-10-07
-Author: Dennis Assenmacher
-Maintainer: Dennis Assenmacher <dennis.assenmacher@uni-muenster.de>
-Description: More about what it does (maybe more than one line)
+Title: Pareto Envelope-Based Selection Algorithm Version II
+Version: 1.0
+Date: 2015-01-04
+Author: Dennis Assenmacher, Christian Homberg
+Maintainer: Dennis Assenmacher <dennis.assenmacher@uni-muenster.de>, Christian Homberg <c_homb01@uni-muenster.de>
+Description: PESA-II implementation based on R. Provides the PESA-II function as well as related functions for crossover, mutation, domination, hypergrids, and the visualization of pareto fronts.
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.6),ggplot2
 LinkingTo: Rcpp

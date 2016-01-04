@@ -1,11 +1,11 @@
 Package: MOCK
 Type: Package
-Title: What the package does (short line)
+Title: Multiobjective Clustering With Automatic k-determination
 Version: 1.0
-Date: 2015-11-11
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: More about what it does (maybe more than one line)
+Date: 2015-01-04
+Author: Dennis Assenmacher, Christian Homberg
+Maintainer: Dennis Assenmacher <dennis.assenmacher@uni-muenster.de>, Christian Homberg <c_homb01@uni-muenster.de>
+Description: MOCK implementation based on R. Provides the mock function as well as all related functions. Also contains various visualization functions.
 License: GPL (>= 2)
 Depends: ggthemes,ggplot2
 Imports: Rcpp (>= 0.11.6),ggplot2,ggthemes,RANN,emoa,gridExtra,nsga2R,vegan
