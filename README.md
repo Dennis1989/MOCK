@@ -12,7 +12,7 @@ All cluster solutions and the approximated pareto front can be visualized by usi
 
 In order to get the packages just type
 
-`devtools::install_github("https://github.com/Dennis1989/MOCK","MOCK")`
+`devtools::install_github(repo="Dennis1989/MOCK",subdir="MOCK")`
 
-`devtools::install_github("https://github.com/Dennis1989/MOCK","PESAII")`
+`devtools::install_github(repo="Dennis1989/MOCK",subdir="PESAII")`
 
