@@ -1,4 +1,5 @@
 #' @author Dennis Assenmacher
+#' @title PESAII
 #' @description Calculates a list of solutions of a given multiobjective optimisation problem by using the PESA-II algorithm.
 #'  @param ipMax Maximum size of internal solutions used to explore new potential solutions.
 #'  @param epMax Maximum size of external population.

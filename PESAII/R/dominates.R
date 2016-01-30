@@ -15,7 +15,8 @@ dominates = function(x, y) {
 #' @description Calculates all entries which are not dominated by any other entry.
 #' @param m Matrix or data.frame that contains rowwise entries.
 #' @return Matrix which contains all non-dominated points
-#' @export
+
+
 nonDominatedSolutions = function(obj)
 {
   indicator=apply(obj,1,function(x){
@@ -31,13 +32,13 @@ nonDominatedSolutions = function(obj)
   return (obj[indicator,])
 }
 
-#' @author Dennis Assenmacher
-#' @examples nonDominatedSolutionsC(mtcars[,c("mpg","hp")])
-#' @title Non-dominated solutions
-#' @description Calculates all entries which are not dominated by any other entry.
-#' @param m Matrix or data.frame that contains rowwise entries.
-#' @return Matrix which contains all non-dominated points
-#' @export
+# @author Dennis Assenmacher
+# @examples nonDominatedSolutionsC(mtcars[,c("mpg","hp")])
+# @title Non-dominated solutions
+# @description Calculates all entries which are not dominated by any other entry.
+# @param m Matrix or data.frame that contains rowwise entries.
+# @return Matrix which contains all non-dominated points
+# @export
 nonDominatedSolutionsC = function(obj){
   if(is.data.frame(obj))
   {
@@ -49,15 +50,6 @@ nonDominatedSolutionsC = function(obj){
     
 }
 
-testtime = function(){
-  set.seed(1234)
-  for(i in 1:10000)
-  {
-    vector1 <- sample(1:1000,500,replace=T)/100
-    vector2 <- sample(1:1000,500,replace=T)/100
-    dominates(vector1,vector2)
-  }
-}
 
 nonDominatedSolutionsIndex = function(obj)
 {

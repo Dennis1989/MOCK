@@ -213,7 +213,7 @@ mock <- function(data,L=10,ipMax=10,epMax=1000,gens=1000,crossRate=0.7,sigma=0.5
       #Generate control fronts using the same parameters for mock as for the pareto front
       controlFronts=createControlFronts(data,method=method,n=controlFronts,L=L,ipMax=ipMax,epMax=epMax,gens=gens,
                                         crossRate=crossRate,sigma=sigma,nGrid=nGrid,maxCluster=maxCluster,
-                                        tournamentN=tournamentN,printN=printN,distinctSolutions=distinctSolutions)
+                                        tournamentN=tournamentN,printN=printN,distinctSolutions=distinctSolutions,points=nrow(data))
       }else if(controlFronts==0){
         print("(5|6) NO CONTROL FRONTS REQUIRED - FINISHED MOCK")
         #Don't create control fronts but only return solution.

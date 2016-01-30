@@ -4,8 +4,12 @@ Title: Pareto Envelope-Based Selection Algorithm Version II
 Version: 1.0
 Date: 2015-01-04
 Author: Dennis Assenmacher, Christian Homberg
-Maintainer: Dennis Assenmacher <dennis.assenmacher@uni-muenster.de>, Christian Homberg <c_homb01@uni-muenster.de>
+Maintainer: Dennis Assenmacher <dennis.assenmacher@uni-muenster.de>
+Authors@R: c(person("Dennis Assenmacher", "Developer",role = c("aut","cre","cph"),email = "dennis.assenmacher@uni-muenster.de"),
+	      person("Chrstian Homberg", "Developer", role = c("aut","cre","cph"),email = "c_homb01@uni-muenster.de"))
 Description: PESA-II implementation based on R. Provides the PESA-II function as well as related functions for crossover, mutation, domination, hypergrids, and the visualization of pareto fronts.
 License: GPL (>= 2)
+BugReports: https://github.com/Dennis1989/MOCK/issues
+URL: https://github.com/Dennis1989/MOCK
 Imports: Rcpp (>= 0.11.6),ggplot2
 LinkingTo: Rcpp
