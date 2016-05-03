@@ -57,7 +57,7 @@ printAttainmentScore <- function(sol)
   candidates = getCandidates(m)
   localoptima = which(diff(sign(diff(candidates[,2])))==-2)+1
   p<-p+geom_point(data=as.data.frame(candidates[localoptima,,drop=F]),aes(x=V1,y=V2),color="red")
- p<- p+geom_text(data=as.data.frame(candidates[localoptima,,drop=F]),aes(x=V1,y=V2,label=V3),hjust=0, vjust=0)
+  p<- p+geom_text(data=as.data.frame(candidates[localoptima,,drop=F]),aes(x=V1,y=V2,label=V3),hjust=0, vjust=0)
 return(p)
  }
 

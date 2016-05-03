@@ -44,7 +44,7 @@ PESAII(ipMax, epMax, gens, vmin = 0, vmax = 1, nvar = 6, fn, data, nn,
 \item{printN}{Generation interval in which to print progress of function. Progress bar is displayed, if null.}
 }
 \description{
-FUCK YOU NIGGA
+PESAII
 
 Calculates a list of solutions of a given multiobjective optimisation problem by using the PESA-II algorithm.
 }
