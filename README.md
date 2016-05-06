@@ -1,6 +1,6 @@
 # Implementation of MOCK in R
 
-Here we have the first working implementation of the multi objective clustering algorithm MOCK, intorduced by 
+Here we have the first working implementation of the multi objective clustering algorithm MOCK, introduced by 
 
 > Julia Handl and Joshua Knowles. (2007) An evolutionary approach to multiobjective clustering. IEEE Transactions on Evolutionary Computation 11(1):56-7
 
