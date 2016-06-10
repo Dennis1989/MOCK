@@ -1,6 +1,11 @@
 colorsMOCK <- c("#000000","#a93226","#58d68d","#2471a3","#17a589", "#ca6f1e","#839192", "#A30059",
-            "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87","#5A0007", "#809693",
-            "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80","#bfc9ca")
+                "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87","#5A0007", "#809693",
+                "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80","#bfc9ca")
+#getting the original color palette
+originalColors=colors()
+
+#adding the default color palette to our pre-defined cluster colors
+colorsMOCK <- append(colorsMOCK,originalColors[length(colorsMOCK):length(originalColors)])
 
 #' #'@importFrom ggplot2 ggplot
 #'@author Dennis Assenmacher
