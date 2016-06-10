@@ -7,7 +7,7 @@ calculateScores <- function(solutionFront,controlFronts){
     kCF = min(kCF,k)
   }
   kmax = min(kSF,kCF)
-  solutionFront$sol = filter(solutionFront$sol,kmax)
+  #solutionFront$sol = filter(solutionFront$sol,kmax)
   for(i in 1:length(controlFronts)){
     controlFronts[[i]]$sol = filter(controlFronts[[i]]$sol,kmax)
   }
