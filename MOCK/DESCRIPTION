@@ -9,7 +9,7 @@ Authors@R: c(person("Dennis Assenmacher", "Developer",role = c("aut","cre","cph"
 	      person("Chrstian Homberg", "Developer", role = c("aut","cre","cph"),email = "c_homb01@uni-muenster.de"))
 Description: MOCK implementation based on R. Provides the mock function as well as all related functions. Also contains various visualization functions.
 License: GPL (>= 2)
-Depends: ggthemes,ggplot2
+Depends: ggthemes, ggplot2, assertthat, colorspace, gtable, scales, permute
 Imports: Rcpp (>= 0.11.6),ggplot2,ggthemes,RANN,emoa,gridExtra,nsga2R,vegan
 BugReports: https://github.com/Dennis1989/MOCK/issues
 URL: https://github.com/Dennis1989/MOCK
